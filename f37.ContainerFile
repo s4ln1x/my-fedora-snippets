@@ -1,6 +1,6 @@
-FROM quay.io/fedora/fedora:36
+FROM quay.io/fedora/fedora:37
 
-LABEL maintainer Salvador Gudino <cero@duck.com>
+MAINTAINER "Salvador Gudino" <cero@duck.com>
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -12,11 +12,16 @@ ARG FAS_ID=fedora-packager
 USER root
 
 # Install fedora packager tools
-RUN dnf install -y fedora-packager \
-                   fedora-review \
-                   sudo \
+RUN dnf update -y && dnf install -y \
+    fedora-packager \
+    fedora-review \
+    sudo \
+    wget \
     && dnf clean all \
     && rm -rf /var/cache/yum
+
+# Add ccache for kerberos
+COPY default_ccache /etc/krb5.conf.d/
 
 # Add development user
 RUN groupadd --gid "${GROUP_ID}" "${USER_NAME}" \
